@@ -5,34 +5,36 @@ Overview
 
 The goal of this project was to explore low-level system programming concepts while building a practical utility. The backend logic was written in C to handle registry scanning, data processing, and memory management. An HTML-based GUI was developed to create a clean and user-friendly interface, allowing users to navigate features such as system scanning, results review, and cleanup operations.
 
-Features
 
-Registry scanning for invalid or outdated entries
+Features:
 
-Cleanup functionality with confirmation safeguards
+-Registry scanning for invalid or outdated entries
 
-Lightweight design with minimal system resource usage
+-Cleanup functionality with confirmation safeguards
 
-HTML-based GUI for improved usability
+-Lightweight design with minimal system resource usage
 
-Structured error handling for safer operation
+-HTML-based GUI for improved usability
 
-Technologies Used
+-Structured error handling for safer operation
 
-C (core system logic and registry interaction)
 
-HTML (graphical user interface layer)
+Technologies Used:
 
-Learning Objectives
+-C (core system logic and registry interaction)
 
-This project strengthened skills in:
+-HTML (graphical user interface layer)
 
-Low-level programming in C
+-Learning Objectives
 
-Memory management
+-This project strengthened skills in:
 
-System-level operations
+-Low-level programming in C
 
-Backend and frontend integration
+-Memory management
 
-Collaborative software development
+-System-level operations
+
+-Backend and frontend integration
+
+-Collaborative software development
