@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex File Search</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 5px;
+            color: #4CAF50;
+        }
+
+        .header .subtitle {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .instructions {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .instructions h3 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        .code {
+            background: #2a2a2a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #4CAF50;
+        }
+
+        .command-examples {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .command-examples h3 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+
+        .command {
+            background: #2a2a2a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4CAF50;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .command:hover {
+            background: #333;
+        }
+
+        .command-desc {
+            color: #ccc;
+            font-size: 0.9em;
+            margin-top: 5px;
+            margin-left: 10px;
+        }
+
+        .search-section {
+            background: #111;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .file-upload {
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 12px;
+            background: #222;
+            border: 2px dashed #333;
+            border-radius: 5px;
+            color: #fff;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .file-input:hover {
+            border-color: #4CAF50;
+        }
+
+        .file-name {
+            color: #4CAF50;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            font-size: 16px;
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 5px;
+            color: #fff;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #4CAF50;
+        }
+
+        .search-button {
+            padding: 12px 25px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-button:hover {
+            background: #45a049;
+        }
+
+        .search-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .results-section {
+            background: #111;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        .results-count {
+            color: #4CAF50;
+            font-size: 0.9em;
+        }
+
+        .result-item {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+            transition: transform 0.2s;
+        }
+
+        .result-item:hover {
+            transform: translateY(-2px);
+            border-color: #4CAF50;
+        }
+
+        .line-number {
+            color: #888;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .full-line {
+            color: #ccc;
+        }
+
+        .match {
+            background-color: #4CAF50;
+            color: #000;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #4CAF50;
+        }
+
+        @media (max-width: 600px) {
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Regex File Search</h1>
+            <div class="subtitle">ECE 3331 Final Project</div>
+        </div>
+
+        <div class="instructions">
+            <h3>How It Works</h3>
+            <p>Upload a text file and enter a regex pattern to search for matches. The results will show each line containing matches with the matched text highlighted.</p>
+            
+            <h3>Supported Regex Features:</h3>
+            <ul>
+                <li><span class="code">^</span> - Start of line</li>
+                <li><span class="code">$</span> - End of line</li>
+                <li><span class="code">.</span> - Any single character</li>
+                <li><span class="code">*</span> - Zero or more of previous character</li>
+                <li><span class="code">+</span> - One or more of previous character</li>
+                <li><span class="code">?</span> - Zero or one of previous character</li>
+                <li><span class="code">[abc]</span> - Any character in brackets</li>
+                <li><span class="code">{n}</span> - Exactly n occurrences</li>
+                <li><span class="code">{n,m}</span> - Between n and m occurrences</li>
+                <li><span class="code">(?i)</span> - Case insensitive matching</li>
+            </ul>
+        </div>
+
+        <div class="command-examples">
+            <h3>Example Patterns</h3>
+            <div class="command">h.llo</div>
+            <div class="command-desc">Find "hello", "hallo", "hxllo", etc.</div>
+
+            <div class="command">^The</div>
+            <div class="command-desc">Find lines starting with "The"</div>
+
+            <div class="command">end$</div>
+            <div class="command-desc">Find lines ending with "end"</div>
+
+            <div class="command">a{2,4}</div>
+            <div class="command-desc">Find "aa", "aaa", or "aaaa"</div>
+
+            <div class="command">colou?r</div>
+            <div class="command-desc">Find "color" or "colour"</div>
+
+            <div class="command">[aeiou]{3}</div>
+            <div class="command-desc">Find three consecutive vowels</div>
+        </div>
+
+        <div class="search-section">
+            <div class="file-upload">
+                <input type="file" id="fileInput" class="file-input" accept=".txt,.log,.csv,.json,.xml,.html,.js,.py,.java,.c,.cpp">
+                <div id="fileName" class="file-name">No file selected</div>
+            </div>
+
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" 
+                       placeholder="Enter your regex pattern (e.g., h.llo, ^The, end$)" autocomplete="off">
+                <button class="search-button" id="searchButton" disabled>Search</button>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="no-results" id="initialMessage">
+                Select a file and enter a regex pattern to search
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const resultsSection = document.getElementById('resultsSection');
+        const initialMessage = document.getElementById('initialMessage');
+
+        let currentFileContent = '';
+
+        // File input handler
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                fileName.textContent = `Selected: ${file.name}`;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentFileContent = e.target.result;
+                    searchButton.disabled = false;
+                };
+                reader.readAsText(file);
+            } else {
+                fileName.textContent = 'No file selected';
+                currentFileContent = '';
+                searchButton.disabled = true;
+            }
+        });
+
+        // Search function
+        function performSearch() {
+            const query = searchInput.value.trim();
+            
+            if (!query) {
+                showMessage('Please enter a regex pattern');
+                return;
+            }
+
+            if (!currentFileContent) {
+                showMessage('Please select a file first');
+                return;
+            }
+
+            showLoading();
+
+            // Simulate processing delay
+            setTimeout(() => {
+                let results = [];
+                
+                try {
+                    // Handle case insensitive flag
+                    let flags = 'gm';
+                    let processedQuery = query;
+                    
+                    if (query.includes('(?i)')) {
+                        flags += 'i';
+                        processedQuery = query.replace('(?i)', '');
+                    }
+                    
+                    // Create regex from user input
+                    const regex = new RegExp(processedQuery, flags);
+                    
+                    // Split file content into lines
+                    const lines = currentFileContent.split('\n');
+                    
+                    // Search through each line
+                    lines.forEach((line, lineNumber) => {
+                        // Test if line contains the pattern
+                        const matches = line.match(regex);
+                        if (matches) {
+                            let highlightedLine = line;
+                            
+                            // Highlight each match in the line
+                            matches.forEach(match => {
+                                // For end-of-line anchors, we need special handling
+                                if (processedQuery.endsWith('$')) {
+                                    // Check if the match is at the end of the line
+                                    const endMatch = match.replace(/\$$/, '');
+                                    if (line.endsWith(endMatch)) {
+                                        const beforeMatch = line.slice(0, line.length - endMatch.length);
+                                        const matchedPart = line.slice(line.length - endMatch.length);
+                                        highlightedLine = beforeMatch + `<span class="match">${escapeHtml(matchedPart)}</span>`;
+                                    }
+                                } else {
+                                    // Regular highlighting for non-anchor patterns
+                                    highlightedLine = highlightedLine.replace(
+                                        new RegExp(escapeRegex(match), 'g'),
+                                        `<span class="match">${escapeHtml(match)}</span>`
+                                    );
+                                }
+                            });
+                            
+                            results.push({
+                                lineNumber: lineNumber + 1,
+                                fullLine: highlightedLine,
+                                originalLine: line
+                            });
+                        }
+                    });
+                } catch (error) {
+                    // Handle invalid regex
+                    displayError("Invalid regex pattern: " + error.message);
+                    return;
+                }
+
+                displayResults(results);
+            }, 300);
+        }
+
+        // Display results
+        function displayResults(results) {
+            if (results.length === 0) {
+                resultsSection.innerHTML = `
+                    <div class="no-results">
+                        <h3>No matches found</h3>
+                        <p>Try a different regex pattern</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const resultsHTML = `
+                <div class="results-header">
+                    <h3>Search Results</h3>
+                    <div class="results-count">${results.length} lines with matches</div>
+                </div>
+                ${results.map(item => `
+                    <div class="result-item">
+                        <span class="line-number">${item.lineNumber}:</span> 
+                        <span class="full-line">${item.fullLine}</span>
+                    </div>
+                `).join('')}
+            `;
+
+            resultsSection.innerHTML = resultsHTML;
+        }
+
+        // Escape regex special characters for string replacement
+        function escapeRegex(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Show message
+        function showMessage(message) {
+            resultsSection.innerHTML = `
+                <div class="no-results">
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // Display error message
+        function displayError(message) {
+            resultsSection.innerHTML = `
+                <div class="no-results">
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // Show loading state
+        function showLoading() {
+            resultsSection.innerHTML = `
+                <div class="loading">
+                    <p>Searching file with regex...</p>
+                </div>
+            `;
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Event listeners
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Add click handlers for example commands
+        document.addEventListener('DOMContentLoaded', function() {
+            const commands = document.querySelectorAll('.command');
+            commands.forEach(command => {
+                command.addEventListener('click', function() {
+                    const pattern = this.textContent;
+                    searchInput.value = pattern;
+                    searchInput.focus();
+                });
+            });
+        });
+    </script>
+</body>
+</html>
